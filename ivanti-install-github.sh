@@ -50,12 +50,21 @@ fi
 
 # Determine which installer to use
 INSTALLER=""
-if echo "$OS_NAME" | grep -qi "Amazon Linux 2023"; then
+if echo "$OS_NAME $OS_VERSION" | grep -qi "Amazon.*2023"; then
     INSTALLER="ivanticloudagent-installer-amzn2023.sh"
     echo "✓ Detected: Amazon Linux 2023"
 elif echo "$OS_NAME" | grep -qi "Amazon Linux 2"; then
     INSTALLER="ivanticloudagent-installer-oracle8.sh"
     echo "✓ Detected: Amazon Linux 2 (using Oracle/RHEL installer)"
+elif echo "$OS_NAME" | grep -qi "Amazon"; then
+    # Fallback for Amazon Linux - check version
+    if [ "$OS_VERSION" = "2023" ] || echo "$OS_VERSION" | grep -q "^2023"; then
+        INSTALLER="ivanticloudagent-installer-amzn2023.sh"
+        echo "✓ Detected: Amazon Linux 2023"
+    else
+        INSTALLER="ivanticloudagent-installer-oracle8.sh"
+        echo "✓ Detected: Amazon Linux 2 (using Oracle/RHEL installer)"
+    fi
 elif echo "$OS_NAME" | grep -qi "Red Hat\|CentOS\|Oracle"; then
     INSTALLER="ivanticloudagent-installer-oracle8.sh"
     echo "✓ Detected: RHEL/CentOS/Oracle Linux"
