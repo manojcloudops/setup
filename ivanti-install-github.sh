@@ -43,6 +43,7 @@ if [ -f /etc/os-release ]; then
     OS_VERSION="$VERSION_ID"
     echo "OS: $OS_NAME"
     echo "Version: $OS_VERSION"
+    echo "Debug: Full OS info - NAME='$NAME' VERSION_ID='$VERSION_ID'"
 else
     echo "❌ ERROR: Cannot detect OS"
     exit 1
@@ -67,12 +68,28 @@ elif echo "$OS_NAME" | grep -qi "Amazon"; then
         INSTALLER="ivanticloudagent-installer-amzn2023.sh"
         echo "✓ Detected: Amazon Linux (using AL2023 installer)"
     fi
+elif echo "$OS_NAME" | grep -qi "Ubuntu"; then
+    # Ubuntu version detection
+    if echo "$OS_VERSION" | grep -q "^24"; then
+        INSTALLER="ivanticloudagent-installer-ubuntu24.sh"
+        echo "✓ Detected: Ubuntu 24.x"
+    elif echo "$OS_VERSION" | grep -q "^22"; then
+        INSTALLER="ivanticloudagent-installer-ubuntu22.sh"
+        echo "✓ Detected: Ubuntu 22.x"
+    elif echo "$OS_VERSION" | grep -q "^20"; then
+        INSTALLER="ivanticloudagent-installer-ubuntu20.sh"
+        echo "✓ Detected: Ubuntu 20.x"
+    else
+        # Default to Ubuntu 22 for other versions
+        INSTALLER="ivanticloudagent-installer-ubuntu22.sh"
+        echo "✓ Detected: Ubuntu $OS_VERSION (using Ubuntu 22 installer)"
+    fi
 elif echo "$OS_NAME" | grep -qi "Red Hat\|CentOS\|Oracle"; then
     INSTALLER="ivanticloudagent-installer-oracle8.sh"
     echo "✓ Detected: RHEL/CentOS/Oracle Linux"
 else
     echo "❌ ERROR: Unsupported OS: $OS_NAME"
-    echo "   Supported: Amazon Linux 2, Amazon Linux 2023, RHEL, CentOS, Oracle Linux"
+    echo "   Supported: Amazon Linux 2/2023, Ubuntu 20/22/24, RHEL, CentOS, Oracle Linux"
     exit 1
 fi
 
